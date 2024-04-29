@@ -1,0 +1,10 @@
+{{#if currentUser}}
+<div>
+    <form action="/consoles_users/upsert" role="form" method="post">
+        <input type="hidden" name="_csrf" value="{{_csrfToken}}">
+        <input type="hidden" name="bookId" value="{{consoleId}}">
+        <input type="hidden" name="userEmail" value="{{currentUser.email}}">
+        <button type="submit">Submit</button>
+    </form>
+</div>
+{{/if}}
