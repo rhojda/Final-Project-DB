@@ -1,31 +1,26 @@
-const games = [
-    { title: "Red Dead Redemption 2" },
-    { title: "Assassins Creed Unity" },
-    { title: "Subnautica" },
-    { title: "Destiny" },
-    { title: "BioShock 1" },
-    { title: "Fallout 76" },
-    { title: "Farcry Primal" },
-];
+const db = require('../database');
 
-exports.add = (game) => {
-    games.push(game);
+exports.all = async () => {
+    const { rows } = await db.getPool().query("select * from games order by id");
+    return db.camelize(rows);
 }
 
-exports.get = (idx) => {
-    return games[idx];
+exports.get = async (id) => {
+    const { rows } = await db.getPool().query("select * from games where id = $1", [id])
+    return db.camelize(rows)[0]
 }
 
-exports.update = (game) => {
-    games[game.id] = game;
+exports.create = async (title) => {
+    return db.getPool().query("INSERT INTO games(title) VALUES($1) RETURNING *", [title]);
 }
 
-exports.upsert = (game) => {
+exports.update = async (id, title) => {
+    return db.getPool().query("UPDATE games SET title = $1 where id = $2 RETURNING *", [title, id]);
+}
+
+exports.upsert = async (game) => {
     if (game.id) {
-        exports.update(game);
-    } else {
-        exports.add(game);
+        return exports.update(game.id, game.title)
     }
+    return exports.create(game.title)
 }
-
-exports.all = games

@@ -1,31 +1,27 @@
-const consoles = [
-    { name: "XBOX 360" },
-    { name: "XBOX One" },
-    { name: "PS4" },
-    { name: "PS5" },
-];
+const db = require('../database');
 
-exports.add = (console) => {
-    consoles.push(console);
+exports.all = async () => {
+    const { rows } = await db.getPool().query("select * from consoles order by id");
+    return db.camelize(rows);
 }
 
-exports.get = (idx) => {
-    return consoles[idx];
+exports.get = async (id) => {
+    const { rows } = await db.getPool().query("select * from consoles where id = $1", [id])
+    return db.camelize(rows)[0]
 }
 
-exports.update = (console) => {
-    consoles[console.id] = console;
+exports.create = async (name) => {
+    return db.getPool().query("INSERT INTO consoles(name) VALUES($1) RETURNING *", [name]);
 }
 
-exports.upsert = (console) => {
-    if (console.gameIds && !Array.isArray(console.gameIds)) {
-        console.gameIds = [console.gameIds];
-    }
+exports.update = async (id, name) => {
+    return db.getPool().query("UPDATE consoles SET name = $1 where id = $2 RETURNING *", [name, id]);
+}
+
+exports.upsert = async (console) => {
     if (console.id) {
-        exports.update(console);
-    } else {
-        exports.add(console);
+        return exports.update(console.id, console.name)
     }
+    return exports.create(console.name)
 }
 
-exports.all = consoles

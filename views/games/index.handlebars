@@ -1,8 +1,9 @@
 <h1>Games</h1>
+
 <a href="/games/form">Add a new Game</a>
 {{#each games}}
 <li>
-    {{@index}} - {{this.title}}
+    <a href="/games/show/{{@index}}">{{@index}} - {{this.title}}</a>
     <a href="/games/edit?id={{@index}}">Edit</a>
 </li>
 {{/each}}

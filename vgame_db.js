@@ -10,11 +10,12 @@ const indexRouter = require('./routes/index');
 const gamesRouter = require('./routes/games');
 const consolesRouter = require('./routes/consoles');
 const usersRouter = require('./routes/users');
-const consolesUsersRouter = require('./routes/consoles_users');
-
+const usersConsolesRouter = require('./routes/users_consoles');
+const path = require('path');
 
 const app = express()
 const port = 3000
+
 
 //extra platform setup
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -32,6 +33,8 @@ app.use((req, res, next) => {
     res.locals._csrfToken = req.csrfToken()
     next()
 })
+
+app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')))
 
 // view engine setup
 var handlebars = require('express-handlebars').create({
@@ -78,7 +81,7 @@ app.use('/', indexRouter);
 app.use('/games', gamesRouter);
 app.use('/consoles', consolesRouter);
 app.use('/users', usersRouter);
-app.use('/consoles_users', consolesUsersRouter);
+app.use('/users_consoles', usersConsolesRouter);
 
 
 

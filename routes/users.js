@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const Console = require('../models/console');
-const ConsoleUser = require('../models/console_user');
+const UserConsole = require('../models/user_console');
 
 const helpers = require('./helpers')
 
@@ -18,7 +18,7 @@ router.post('/register', async (req, res, next) => {
         return
     }
     console.log('body: ' + JSON.stringify(req.body));
-    const user = User.getByEmail(req.body.email)
+    const user = await User.getByEmail(req.body.email)
     if (user) {
         res.render('users/register', {
             title: 'Video Game Database || Login',
@@ -29,7 +29,7 @@ router.post('/register', async (req, res, next) => {
             }
         });
     } else {
-        User.add(req.body);
+        await User.add(req.body);
         req.session.flash = {
             type: 'info',
             intro: 'Success!',
@@ -51,7 +51,7 @@ router.post('/login', async (req, res, next) => {
         return
     }
     console.log('body: ' + JSON.stringify(req.body));
-    const user = User.login(req.body)
+    const user = await User.login(req.body)
     if (user) {
         req.session.currentUser = user
         req.session.flash = {
@@ -86,16 +86,17 @@ router.get('/profile', async (req, res, next) => {
     if (helpers.isNotLoggedIn(req, res)) {
         return
     }
-    const consolesUser = ConsoleUser.AllForUser(req.session.currentUser.email);
-    consolesUser.forEach((consoleUser) => {
-        consoleUser.console = Console.get(consoleUser.consoleId)
+    const usersConsole = UserConsole.AllForUser(req.session.currentUser.email);
+    usersConsole.forEach((userConsole) => {
+        userConsole.console = Console.get(userConsole.consoleId)
     })
     res.render('users/profile',
         {
             title: 'Video Game Database || Profile',
             user: req.session.currentUser,
-            consolesUser: consolesUser
+            usersConsole: usersConsole
         });
 });
+
 
 module.exports = router;
